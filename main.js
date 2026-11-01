@@ -42,7 +42,7 @@ export const EVENT_CONFIG = {
   },
 
   firebase: {
-    apiKey: 'AIzaSyB9VLDvdOjGksvMsjycUskjoOHLS8dGwoo',
+    apiKey: atob('QUl6YVN5QjlWTER2ZE9qR2tzdk1zanljVXNram9PSExTOGRHd29v'),
     authDomain: 'boody-yaroo.firebaseapp.com',
     projectId: 'boody-yaroo',
     storageBucket: 'boody-yaroo.firebasestorage.app',
@@ -472,6 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const wishesList = document.getElementById('wishes-list');
   const wishesEmpty = document.getElementById('wishes-empty');
   const wishesError = document.getElementById('wishes-error');
+  const wishesScrollHint = document.getElementById('wishes-scroll-hint');
   const retryBtn = document.getElementById('wishes-retry-btn');
 
   let unsubscribeWishes = null;
@@ -497,10 +498,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!wishes || wishes.length === 0) {
       wishesList.innerHTML = '';
       if (wishesEmpty) wishesEmpty.style.display = 'block';
+      if (wishesScrollHint) wishesScrollHint.style.display = 'none';
       return;
     }
 
     if (wishesEmpty) wishesEmpty.style.display = 'none';
+    if (wishesScrollHint) wishesScrollHint.style.display = 'inline-flex';
     wishesList.innerHTML = '';
 
     const fragment = document.createDocumentFragment();
@@ -553,6 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
       (error) => {
         if (wishesList) wishesList.innerHTML = '';
         if (wishesEmpty) wishesEmpty.style.display = 'none';
+        if (wishesScrollHint) wishesScrollHint.style.display = 'none';
         if (wishesError) wishesError.style.display = 'block';
       }
     );

@@ -45,6 +45,7 @@
 
 html {
   width: 100%;
+  height: 100%;
   font-size: 16px;
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
@@ -53,6 +54,7 @@ html {
 
 body {
   width: 100%;
+  min-height: 100%;
   min-height: 100vh;
   min-height: 100svh;
   min-height: 100dvh;
@@ -64,6 +66,13 @@ body {
   color: var(--color-dark-brown);
   font-family: var(--font-body);
   line-height: 1.6;
+}
+
+/* Lock scrolling while the full-screen intro overlay is active */
+body:not(.invitation-open) {
+  overflow: hidden !important;
+  height: 100% !important;
+  touch-action: none;
 }
 
 img,
@@ -117,18 +126,26 @@ section {
 .intro-overlay {
   position: fixed;
   inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  width: 100vw;
+  height: 100%;
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
   z-index: 9999;
-  min-height: 100vh;
-  min-height: 100svh;
-  min-height: 100dvh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding:
-    max(1.5rem, env(safe-area-inset-top))
-    max(1.5rem, env(safe-area-inset-right))
-    max(1.5rem, env(safe-area-inset-bottom))
-    max(1.5rem, env(safe-area-inset-left));
+    max(0.75rem, env(safe-area-inset-top))
+    max(0.75rem, env(safe-area-inset-right))
+    max(0.75rem, env(safe-area-inset-bottom))
+    max(0.75rem, env(safe-area-inset-left));
   cursor: pointer;
   overflow: hidden;
   user-select: none;
@@ -144,16 +161,19 @@ section {
 .intro-background {
   position: absolute;
   inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   z-index: 1;
+  pointer-events: none;
 }
 
 .intro-bg-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center center;
   filter: brightness(0.97);
 }
 
@@ -161,10 +181,12 @@ section {
   position: relative;
   z-index: 2;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
   width: 100%;
-  max-width: 96vw;
+  max-width: 94vw;
   margin: auto;
   animation: introFadeUp 900ms ease-out;
 }
@@ -172,7 +194,7 @@ section {
 @keyframes introFadeUp {
   0% {
     opacity: 0;
-    transform: translateY(16px) scale(0.96);
+    transform: translateY(14px) scale(0.96);
   }
   100% {
     opacity: 1;
@@ -186,6 +208,7 @@ section {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -196,37 +219,35 @@ section {
 
 .intro-envelope {
   display: block;
-  width: clamp(310px, 86vw, 470px);
-  max-width: min(92vw, 490px);
+  width: clamp(250px, 74vw, 360px);
+  max-width: min(86vw, 360px);
+  max-height: min(42vh, 350px);
   height: auto;
   object-fit: contain;
   margin-inline: auto;
-  filter: drop-shadow(0 20px 42px rgba(89, 55, 44, 0.28));
+  filter: drop-shadow(0 18px 36px rgba(89, 55, 44, 0.28));
 }
 
 @media (min-width: 769px) {
   .intro-envelope {
-    width: clamp(420px, 36vw, 550px);
-    max-width: min(88vw, 560px);
+    width: clamp(380px, 32vw, 490px);
+    max-width: min(85vw, 500px);
+    max-height: min(48vh, 480px);
   }
 }
 
 .intro-text-group {
-  position: absolute;
-  top: calc(100% - 32px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 90vw;
   display: flex;
   flex-direction: column;
   align-items: center;
-  pointer-events: none;
+  margin-block-start: -22px;
+  width: 100%;
+  max-width: 90vw;
 }
 
 @media (min-width: 769px) {
   .intro-text-group {
-    top: calc(100% - 46px);
+    margin-block-start: -28px;
   }
 }
 
@@ -235,7 +256,7 @@ section {
   text-align: center;
   color: var(--color-dark-brown);
   font-family: var(--font-english-text);
-  font-size: clamp(1.4rem, 3.6vw, 2.1rem);
+  font-size: clamp(1.3rem, 3.4vw, 1.95rem);
   font-weight: 500;
   letter-spacing: 0.5px;
   line-height: 1.25;
@@ -247,9 +268,9 @@ section {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  margin-block-start: 0.35rem;
-  padding: 0.35rem 1rem;
-  background-color: rgba(250, 240, 230, 0.92);
+  margin-block-start: 0.4rem;
+  padding: 0.35rem 1.1rem;
+  background-color: rgba(250, 240, 230, 0.94);
   color: var(--color-burnt-orange);
   font-size: clamp(0.82rem, 2vw, 0.92rem);
   font-weight: 600;
@@ -258,19 +279,20 @@ section {
   animation: pulseHint 2.2s infinite ease-in-out;
 }
 
-@media (max-height: 560px) {
+@media (max-height: 600px) {
   .intro-envelope {
-    width: clamp(170px, 42vh, 250px);
+    width: clamp(160px, 36vh, 230px);
+    max-height: 36vh;
   }
   .intro-text-group {
-    top: calc(100% - 18px);
+    margin-block-start: -14px;
   }
   .intro-tagline {
     font-size: 1.15rem;
   }
   .intro-tap-hint {
-    margin-block-start: 0.2rem;
-    padding: 0.2rem 0.75rem;
+    margin-block-start: 0.25rem;
+    padding: 0.25rem 0.8rem;
     font-size: 0.75rem;
   }
 }
@@ -1155,18 +1177,115 @@ section {
 }
 
 /* ==========================================================================
-   7. Guest Wishes Stream Section
+   7. Guest Wishes Stream Section & Scrollable Panel
    ========================================================================== */
 
 .guest-wishes-section {
   text-align: center;
 }
 
+.wishes-panel {
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+  max-height: 65vh;
+  max-height: 65dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: clamp(0.75rem, 2vw, 1.25rem);
+  background: rgba(250, 240, 230, 0.5);
+  border: 1.5px solid var(--color-beige);
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 2px 8px rgba(89, 55, 44, 0.05);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-terracotta) var(--color-beige-soft);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom Scrollbar for Wishes Panel */
+.wishes-panel::-webkit-scrollbar {
+  width: 7px;
+}
+
+.wishes-panel::-webkit-scrollbar-track {
+  background: var(--color-beige-soft);
+  border-radius: var(--radius-full);
+  margin-block: 8px;
+}
+
+.wishes-panel::-webkit-scrollbar-thumb {
+  background: var(--color-terracotta);
+  border-radius: var(--radius-full);
+}
+
+.wishes-panel::-webkit-scrollbar-thumb:hover {
+  background: var(--color-burnt-orange);
+}
+
+/* Wishes Grid Inside Panel: 1 col on mobile, 3 cols on laptop */
 .wishes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: 1fr; /* Mobile: 1 message across */
+  gap: 1.1rem;
   text-align: start;
+}
+
+@media (min-width: 640px) {
+  .wishes-grid {
+    grid-template-columns: repeat(2, 1fr); /* Tablet: 2 messages across */
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 960px) {
+  .wishes-grid {
+    grid-template-columns: repeat(3, 1fr); /* Laptop / Desktop: 3 messages across */
+    gap: 1.35rem;
+  }
+}
+
+.wishes-scroll-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-block-start: 1rem;
+  padding: 0.45rem 1.25rem;
+  background-color: var(--color-beige-soft);
+  border: 1px solid var(--color-beige);
+  border-radius: var(--radius-full);
+  color: var(--color-burnt-orange);
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(89, 55, 44, 0.06);
+  user-select: none;
+  flex-wrap: wrap;
+}
+
+.scroll-hint-icon {
+  animation: bounceHint 1.8s infinite ease-in-out;
+  color: var(--color-burnt-orange);
+  flex-shrink: 0;
+}
+
+.hint-en {
+  font-family: var(--font-english-text);
+  font-size: 1rem;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+}
+
+.hint-dot {
+  opacity: 0.4;
+}
+
+@keyframes bounceHint {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
 }
 
 .wish-card {
@@ -1350,13 +1469,13 @@ section {
 .developer-credit a {
   color: var(--color-burnt-orange);
   font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  transition: color 0.2s ease;
+  text-decoration: none;
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 .developer-credit a:hover {
   color: var(--color-burnt-orange-dark);
+  opacity: 0.85;
 }
 
 /* ==========================================================================
