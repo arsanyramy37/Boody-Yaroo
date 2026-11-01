@@ -177,6 +177,14 @@ section {
   filter: brightness(0.97);
 }
 
+/* Safari viewport‑unit fix */
+@media not all and (min-resolution:.001dpcm) {
+  .intro-bg-img {
+    height: -webkit-fill-available;
+    min-height: -webkit-fill-available;
+  }
+}
+
 .intro-content {
   position: relative;
   z-index: 2;
