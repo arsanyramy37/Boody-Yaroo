@@ -69,25 +69,29 @@ body {
 }
 
 /* Lock scrolling while the full-screen intro overlay is active */
-html:not(.invitation-open),
+html:not(.invitation-open) {
+  overflow: hidden !important;
+}
+
 body:not(.invitation-open) {
   overflow: hidden !important;
+  height: 100% !important;
   touch-action: none !important;
 }
 
-body:not(.invitation-open) {
-  height: 100% !important;
+/* Immediately restore scroll once overlay is dismissed */
+html.invitation-open {
+  overflow-x: clip;
+  /* Do NOT set overflow-y here — keeps scroll on viewport so position:sticky works */
 }
 
-/* Immediately restore scroll once overlay is dismissed */
-html.invitation-open,
 body.invitation-open {
-  overflow: auto !important;
-  overflow-y: scroll !important;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
   height: auto !important;
   touch-action: auto !important;
   pointer-events: auto !important;
-  -webkit-overflow-scrolling: touch !important;
+  -webkit-overflow-scrolling: touch;
 }
 
 img,

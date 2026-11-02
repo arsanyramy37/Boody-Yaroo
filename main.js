@@ -349,13 +349,13 @@ document.addEventListener('DOMContentLoaded', () => {
       document.documentElement.classList.add('invitation-open');
       document.documentElement.style.overflow    = '';
       document.documentElement.style.touchAction = '';
+      document.documentElement.style.overflowY   = '';
       document.body.classList.add('invitation-open');
       document.body.style.overflow        = '';
       document.body.style.height          = '';
       document.body.style.touchAction     = '';
       document.body.style.pointerEvents   = '';
-      document.body.style.overflowY       = 'scroll';
-      document.documentElement.style.overflowY = 'scroll';
+      document.body.style.overflowY       = '';
     };
 
     const onTransitionEnd = (event) => {
