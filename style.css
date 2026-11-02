@@ -69,18 +69,25 @@ body {
 }
 
 /* Lock scrolling while the full-screen intro overlay is active */
+html:not(.invitation-open),
 body:not(.invitation-open) {
   overflow: hidden !important;
+  touch-action: none !important;
+}
+
+body:not(.invitation-open) {
   height: 100% !important;
-  touch-action: none;
 }
 
 /* Immediately restore scroll once overlay is dismissed */
+html.invitation-open,
 body.invitation-open {
   overflow: auto !important;
+  overflow-y: scroll !important;
   height: auto !important;
   touch-action: auto !important;
   pointer-events: auto !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
 img,

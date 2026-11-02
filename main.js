@@ -301,9 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isOpening) return;
     isOpening = true;
 
-    // Block all touch/click interaction during the sequence
+    // Block click-through during the animation sequence ONLY on the overlay itself
     overlay.style.pointerEvents = 'none';
-    overlay.style.touchAction   = 'none';
 
     // Direct user gesture to start audio
     audioController.play();
@@ -337,14 +336,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Step 2: after 3 s, fade the whole overlay out ---
     const dismissAfter = 3000; // ms to show the opened envelope
 
+    let finished = false;
     const finishOpening = () => {
+      if (finished) return;
+      finished = true;
+
       overlay.classList.add('is-hidden');
       overlay.setAttribute('aria-hidden', 'true');
-      document.body.classList.add('invitation-open');
-      // Re-enable scroll & touch now that overlay is gone
-      document.body.style.pointerEvents = '';
-      document.body.style.touchAction   = '';
       overlay.removeEventListener('transitionend', onTransitionEnd);
+
+      // Unlock scroll on BOTH html and body — covers all browsers & iOS Safari
+      document.documentElement.classList.add('invitation-open');
+      document.documentElement.style.overflow    = '';
+      document.documentElement.style.touchAction = '';
+      document.body.classList.add('invitation-open');
+      document.body.style.overflow        = '';
+      document.body.style.height          = '';
+      document.body.style.touchAction     = '';
+      document.body.style.pointerEvents   = '';
+      document.body.style.overflowY       = 'scroll';
+      document.documentElement.style.overflowY = 'scroll';
     };
 
     const onTransitionEnd = (event) => {
@@ -356,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       overlay.classList.add('is-opening'); // triggers opacity → 0 CSS transition
       overlay.addEventListener('transitionend', onTransitionEnd);
-      window.setTimeout(finishOpening, 800); // reliable fallback
+      window.setTimeout(finishOpening, 850); // reliable fallback
     }, dismissAfter);
   }
 
