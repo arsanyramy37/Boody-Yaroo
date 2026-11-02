@@ -1,62 +1,119 @@
-const fs = require('fs');
-const path = require('path');
-const ROOT = 'C:/Users/arsanyramy/Desktop/Boody-Yaroo';
+const fs = require('node:fs');
+const path = require('node:path');
 
-const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-const css  = fs.readFileSync(path.join(ROOT, 'style.css'), 'utf8');
-const js   = fs.readFileSync(path.join(ROOT, 'main.js'), 'utf8');
+const root = __dirname;
+const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const css = fs.readFileSync(path.join(root, 'style.css'), 'utf8');
+const js = fs.readFileSync(path.join(root, 'main.js'), 'utf8');
+const headersPath = path.join(root, '_headers');
+const headers = fs.existsSync(headersPath)
+  ? fs.readFileSync(headersPath, 'utf8')
+  : '';
 
-let pass = true;
-const log = (ok, msg) => { if (!ok) pass = false; console.log((ok ? '✅' : '❌') + ' ' + msg); };
+let passed = true;
+const check = (condition, description) => {
+  if (!condition) passed = false;
+  console.log(`${condition ? 'PASS' : 'FAIL'} ${description}`);
+};
 
-// 1. DOM IDs
-const ids = [
-  'intro-overlay','site-header','hero','event-details','countdown','send-wish',
-  'guest-wishes','countdown-days','countdown-hours','countdown-minutes',
-  'countdown-seconds','countdown-timer','countdown-expired','wishes-list',
-  'wishes-empty','wishes-error','wish-form','wish-name','wish-message',
-  'char-counter','form-status','wish-submit-btn','wishes-retry-btn',
-  'music-toggle-btn','mobile-menu-btn','nav-menu','venue-map-link'
+const requiredIds = [
+  'intro-overlay',
+  'site-header',
+  'hero',
+  'event-details',
+  'countdown',
+  'send-wish',
+  'countdown-days',
+  'countdown-hours',
+  'countdown-minutes',
+  'countdown-seconds',
+  'countdown-timer',
+  'countdown-expired',
+  'wish-form',
+  'wish-name',
+  'wish-message',
+  'char-counter',
+  'form-status',
+  'wish-submit-btn',
+  'music-toggle-btn',
+  'mobile-menu-btn',
+  'nav-menu',
+  'venue-map-link',
+  'wishes-ticker',
+  'ticker-viewport',
+  'ticker-track',
 ];
-ids.forEach(id => log(html.includes(`id="${id}"`), `DOM id: ${id}`));
 
-// 2. Asset files
-const assets = [
-  'assets/imgs/envelope.webp','assets/imgs/opened.webp',
-  'assets/imgs/overlaybgmobile.webp','assets/imgs/overlaybglap.webp',
-  'assets/imgs/BY.webp','assets/audio/music.mp3'
-];
-assets.forEach(a => {
-  const exists = fs.existsSync(path.join(ROOT, a));
-  log(exists, `Asset exists: ${a}`);
+const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
+const idCounts = new Map();
+ids.forEach((id) => idCounts.set(id, (idCounts.get(id) || 0) + 1));
+
+requiredIds.forEach((id) => {
+  check(idCounts.get(id) === 1, `Unique required DOM id: ${id}`);
+});
+check(
+  [...idCounts.values()].every((count) => count === 1),
+  'No duplicate DOM ids'
+);
+check(!idCounts.has('guest-wishes'), 'Retired guest-wishes section is absent');
+
+const localReferences = [
+  ...html.matchAll(/\b(?:src|href|srcset)="([^"]+)"/g),
+].flatMap((match) =>
+  match[0].startsWith('srcset=')
+    ? match[1].split(',').map((item) => item.trim().split(/\s+/)[0])
+    : [match[1]]
+);
+
+localReferences
+  .filter((reference) => {
+    return (
+      reference &&
+      !reference.startsWith('#') &&
+      !reference.startsWith('//') &&
+      !/^[a-z][a-z\d+.-]*:/i.test(reference)
+    );
+  })
+  .forEach((reference) => {
+    const localPath = decodeURIComponent(reference.split(/[?#]/)[0]);
+    check(
+      fs.existsSync(path.resolve(root, localPath)),
+      `Local HTML asset exists: ${localPath}`
+    );
+  });
+
+const runtimeAssets = new Set(
+  [...js.matchAll(/['"](assets\/[^'"]+)['"]/g)].map((match) => match[1])
+);
+runtimeAssets.forEach((asset) => {
+  check(fs.existsSync(path.resolve(root, asset)), `Local JavaScript asset exists: ${asset}`);
 });
 
-// 3. intro-names-above in HTML
-log(html.includes('intro-names-above'), 'intro-names-above element present');
+const cssWithoutComments = css.replace(/\/\*[\s\S]*?\*\//g, '');
+let braceBalance = 0;
+for (const character of cssWithoutComments) {
+  if (character === '{') braceBalance += 1;
+  if (character === '}') braceBalance -= 1;
+}
+check(braceBalance === 0, `CSS braces are balanced (${braceBalance})`);
+check(css.includes('.wishes-ticker-bar'), 'Wishes ticker styles are present');
+check(css.includes('.ticker-viewport'), 'Scrollable ticker styles are present');
+check(css.includes('prefers-reduced-motion'), 'Reduced-motion support is present');
 
-// 4. is-hidden-for-open in JS
-log(js.includes('is-hidden-for-open'), 'JS hides text on open');
+check(fs.existsSync(headersPath), 'Static-host response headers file exists');
+[
+  /^  X-Content-Type-Options:\s*nosniff$/im,
+  /^  X-Frame-Options:\s*DENY$/im,
+  /^  Referrer-Policy:\s*strict-origin-when-cross-origin$/im,
+  /^  Permissions-Policy:/im,
+].forEach((pattern) => check(pattern.test(headers), `Security header: ${pattern.source}`));
+check(/Cache-Control:\s*public,\s*max-age=31536000,\s*immutable/i.test(headers), 'Assets use long-lived immutable caching');
+check(/Cache-Control:\s*public,\s*max-age=0,\s*must-revalidate/i.test(headers), 'HTML and app code revalidate on deploy');
 
-// 5. No raw Firebase key
-const rawKeyPattern = /AIzaSy[A-Za-z0-9_-]{33}/;
-log(!rawKeyPattern.test(js), 'No raw Firebase key in JS');
+check(
+  /https:\/\/www\.gstatic\.com\/firebasejs\/13\.1\.0\//.test(js),
+  'Firebase SDK uses a pinned version'
+);
 
-// 6. CSS brace balance
-let braces = 0;
-for (const ch of css) { if (ch==='{') braces++; else if (ch==='}') braces--; }
-log(braces === 0, `CSS brace balance = ${braces}`);
-
-// 7. invitation-open in CSS
-log(css.includes('invitation-open'), 'body.invitation-open unlock rule present');
-
-// 8. preload opened.webp
-log(html.includes('preload') && html.includes('opened.webp'), 'opened.webp preloaded');
-
-// 9. viewport-fit=cover
-log(html.includes('viewport-fit=cover'), 'viewport-fit=cover meta present');
-
-// 10. _headers file
-log(fs.existsSync(path.join(ROOT, '_headers')), '_headers file present');
-
-console.log('\n' + (pass ? '🎉 ALL CHECKS PASSED — ready for production' : '⚠️  SOME CHECKS FAILED — review above'));
-
+console.log(`\n${passed ? 'Production sanity checks passed.' : 'Production sanity checks failed.'}`);
+if (!passed) process.exitCode = 1;

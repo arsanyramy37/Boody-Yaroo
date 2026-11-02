@@ -121,7 +121,6 @@
             <li><a href="#event-details" class="nav-link">تفاصيل الفرح</a></li>
             <li><a href="#countdown" class="nav-link">العد التنازلي</a></li>
             <li><a href="#send-wish" class="nav-link">ابعت تهنئتك</a></li>
-            <li><a href="#guest-wishes" class="nav-link">التهاني </a></li>
           </ul>
         </nav>
 
@@ -170,6 +169,27 @@
         </div>
       </div>
     </header>
+
+    <!-- ============================================== -->
+    <!-- 2.1 Live Wishes Marquee Ticker Bar             -->
+    <!-- ============================================== -->
+    <div id="wishes-ticker" class="wishes-ticker-bar" aria-label="شريط التهاني المباشرة">
+      <div class="ticker-badge">
+        <span class="ticker-live-dot" aria-hidden="true"></span>
+        <span class="ticker-badge-text">LIVE WISHES</span>
+      </div>
+      <div id="ticker-viewport" class="ticker-viewport" tabindex="0" role="region" aria-label="التهاني المتحركة">
+        <div id="ticker-track" class="ticker-track">
+          <div class="ticker-item ticker-loading">
+            <span class="ticker-msg">جاري تحميل التهاني...</span>
+          </div>
+        </div>
+      </div>
+      <a href="#send-wish" class="ticker-cta-btn" aria-label="ابعت تهنئتك">
+        <span class="ticker-cta-icon">💌</span>
+        <span class="ticker-cta-text">ابعت تهنئتك</span>
+      </a>
+    </div>
 
     <!-- ============================================== -->
     <!-- Main Page Content                              -->
@@ -539,95 +559,6 @@
         </div>
       </section>
 
-      <!-- ============================================== -->
-      <!-- 7. Guest Wishes Stream Section                 -->
-      <!-- ============================================== -->
-      <section id="guest-wishes" class="guest-wishes-section reveal-on-scroll">
-        <div class="container">
-          <div class="section-header">
-            <h2 class="section-title" lang="en" dir="ltr">Wishes Wall</h2>
-            <div class="section-divider" aria-hidden="true">
-              <span class="divider-line"></span>
-              <span class="divider-gem">✦</span>
-              <span class="divider-line"></span>
-            </div>
-            <p class="section-subtitle" lang="en" dir="ltr">
-              Thank you for sharing your love &amp; blessings with us
-            </p>
-          </div>
-
-          <div class="wishes-panel">
-            <div
-              id="wishes-list"
-              class="wishes-grid"
-              aria-label="قائمة تهاني الضيوف"
-            >
-              <!-- Loading skeleton will be displayed initially -->
-              <div class="wish-card skeleton-card" aria-hidden="true">
-                <div class="skeleton-header"></div>
-                <div class="skeleton-line"></div>
-                <div class="skeleton-line short"></div>
-              </div>
-              <div class="wish-card skeleton-card" aria-hidden="true">
-                <div class="skeleton-header"></div>
-                <div class="skeleton-line"></div>
-                <div class="skeleton-line short"></div>
-              </div>
-              <div class="wish-card skeleton-card" aria-hidden="true">
-                <div class="skeleton-header"></div>
-                <div class="skeleton-line"></div>
-                <div class="skeleton-line short"></div>
-              </div>
-            </div>
-
-            <div
-              id="wishes-empty"
-              class="wishes-empty-msg"
-              style="display: none"
-            >
-              <div class="empty-icon" aria-hidden="true">💌</div>
-              <p class="empty-text">كن أول المهنئين وشاركنا فرحتنا!</p>
-            </div>
-
-            <div
-              id="wishes-error"
-              class="wishes-error-msg"
-              style="display: none"
-            >
-              <p class="error-text">
-                تعذر تحميل التهاني حالياً، يرجى المحاولة لاحقاً.
-              </p>
-              <button
-                id="wishes-retry-btn"
-                type="button"
-                class="btn btn-secondary retry-btn"
-              >
-                إعادة المحاولة
-              </button>
-            </div>
-          </div>
-
-          <div id="wishes-scroll-hint" class="wishes-scroll-hint">
-            <svg
-              class="scroll-hint-icon"
-              viewBox="0 0 24 24"
-              width="18"
-              height="18"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M12 5v14M19 12l-7 7-7-7" />
-            </svg>
-            <span class="hint-en" lang="en" dir="ltr"
-              >Scroll inside panel to see more wishes</span
-            >
-          </div>
-        </div>
-      </section>
     </main>
 
     <!-- ============================================== -->

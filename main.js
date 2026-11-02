@@ -519,79 +519,145 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- Real-time Guest Wishes Stream ---
-  const wishesList = document.getElementById('wishes-list');
-  const wishesEmpty = document.getElementById('wishes-empty');
-  const wishesError = document.getElementById('wishes-error');
-  const wishesScrollHint = document.getElementById('wishes-scroll-hint');
-  const retryBtn = document.getElementById('wishes-retry-btn');
+  // --- Real-time Guest Wishes Live Marquee Ticker ---
+  const tickerViewport = document.getElementById('ticker-viewport');
+  const tickerTrack = document.getElementById('ticker-track');
 
   let unsubscribeWishes = null;
+  let tickerAnimId = null;
+  let isUserInteracting = false;
+  let resumeTimeout = null;
 
-  function formatDate(timestamp) {
-    if (!timestamp) return '';
-    try {
-      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-      return new Intl.DateTimeFormat('ar-EG', {
-        month: 'short',
-        day: 'numeric',
-      }).format(date);
-    } catch {
-      return '';
+  function renderTickerWishes(wishes) {
+    if (!tickerTrack || !tickerViewport) return;
+
+    if (tickerAnimId) {
+      cancelAnimationFrame(tickerAnimId);
+      tickerAnimId = null;
     }
-  }
-
-  function renderWishes(wishes) {
-    if (!wishesList) return;
-
-    if (wishesError) wishesError.style.display = 'none';
 
     if (!wishes || wishes.length === 0) {
-      wishesList.innerHTML = '';
-      if (wishesEmpty) wishesEmpty.style.display = 'block';
-      if (wishesScrollHint) wishesScrollHint.style.display = 'none';
+      tickerTrack.innerHTML = `
+        <div class="ticker-item">
+          <span class="ticker-msg">كن أول المهنئين وشاركنا فرحتنا! 💌</span>
+        </div>
+      `;
       return;
     }
 
-    if (wishesEmpty) wishesEmpty.style.display = 'none';
-    if (wishesScrollHint) wishesScrollHint.style.display = 'inline-flex';
-    wishesList.innerHTML = '';
+    // Build items HTML
+    const buildItemsHTML = (list) => {
+      return list
+        .map((wish) => {
+          const author = (wish.name || 'محب').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          const msg = (wish.message || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          return `
+            <div class="ticker-item">
+              <span class="ticker-author">${author}</span>
+              <span class="ticker-msg">"${msg}"</span>
+              <span class="ticker-star" aria-hidden="true">✦</span>
+            </div>
+          `;
+        })
+        .join('');
+    };
 
-    const fragment = document.createDocumentFragment();
+    const baseHtml = buildItemsHTML(wishes);
+    tickerTrack.innerHTML = baseHtml;
+    const cycleWidth = tickerTrack.scrollWidth;
+    const copyCount = Math.max(
+      2,
+      Math.ceil((tickerViewport.clientWidth + cycleWidth) / cycleWidth)
+    );
+    tickerTrack.innerHTML = Array.from({ length: copyCount }, () => baseHtml).join('');
 
-    wishes.forEach((wish) => {
-      const card = document.createElement('div');
-      card.className = 'wish-card';
+    initTickerMarquee(cycleWidth);
+  }
 
-      const header = document.createElement('div');
-      header.className = 'wish-header';
+  function initTickerMarquee(cycleWidth) {
+    if (!tickerViewport || !tickerTrack) return;
 
-      const author = document.createElement('span');
-      author.className = 'wish-author';
-      // Safe text rendering to prevent XSS
-      author.textContent = wish.name || 'محب';
+    const speed = 0.75; // pixels per frame (smooth & readable)
+    tickerViewport.scrollLeft = cycleWidth;
 
-      header.appendChild(author);
-
-      if (wish.createdAt) {
-        const dateSpan = document.createElement('span');
-        dateSpan.className = 'wish-date';
-        dateSpan.textContent = formatDate(wish.createdAt);
-        header.appendChild(dateSpan);
+    function step() {
+      if (!isUserInteracting) {
+        let nextScrollLeft = tickerViewport.scrollLeft - speed;
+        if (nextScrollLeft <= 0) {
+          nextScrollLeft += cycleWidth;
+        } else if (nextScrollLeft >= cycleWidth) {
+          nextScrollLeft %= cycleWidth;
+        }
+        tickerViewport.scrollLeft = nextScrollLeft;
       }
+      tickerAnimId = requestAnimationFrame(step);
+    }
 
-      const msg = document.createElement('p');
-      msg.className = 'wish-message';
-      // Safe text rendering to prevent XSS
-      msg.textContent = wish.message || '';
+    tickerAnimId = requestAnimationFrame(step);
+  }
 
-      card.appendChild(header);
-      card.appendChild(msg);
+  // Allow manual swipe, mouse drag, and keyboard scrolling
+  if (tickerViewport) {
+    let activePointerId = null;
+    let pointerStartX = 0;
+    let scrollStartLeft = 0;
 
-      fragment.appendChild(card);
+    const pauseTicker = () => {
+      isUserInteracting = true;
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+    };
+
+    const resumeTicker = () => {
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+      resumeTimeout = setTimeout(() => {
+        isUserInteracting = false;
+      }, 2000);
+    };
+
+    tickerViewport.addEventListener('pointerdown', (event) => {
+      pauseTicker();
+      if (event.pointerType !== 'mouse' || event.button !== 0) return;
+
+      activePointerId = event.pointerId;
+      pointerStartX = event.clientX;
+      scrollStartLeft = tickerViewport.scrollLeft;
+      tickerViewport.classList.add('is-dragging');
+      tickerViewport.setPointerCapture(event.pointerId);
     });
 
-    wishesList.appendChild(fragment);
+    tickerViewport.addEventListener('pointermove', (event) => {
+      if (event.pointerId === activePointerId) {
+        tickerViewport.scrollLeft = scrollStartLeft - (event.clientX - pointerStartX);
+      }
+    });
+
+    const finishPointerInteraction = (event) => {
+      if (event.pointerId !== activePointerId && activePointerId !== null) return;
+      activePointerId = null;
+      tickerViewport.classList.remove('is-dragging');
+      resumeTicker();
+    };
+
+    tickerViewport.addEventListener('pointerup', finishPointerInteraction);
+    tickerViewport.addEventListener('pointercancel', finishPointerInteraction);
+    tickerViewport.addEventListener('wheel', () => {
+      pauseTicker();
+      resumeTicker();
+    }, { passive: true });
+    tickerViewport.addEventListener('keydown', (event) => {
+      if (['ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown'].includes(event.key)) {
+        pauseTicker();
+        resumeTicker();
+      }
+    });
+    tickerViewport.addEventListener('scroll', () => {
+      if (isUserInteracting) {
+        if (resumeTimeout) clearTimeout(resumeTimeout);
+        resumeTimeout = setTimeout(() => {
+          isUserInteracting = false;
+        }, 2500);
+      }
+    }, { passive: true });
   }
 
   function startWishesSubscription() {
@@ -602,34 +668,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     unsubscribeWishes = subscribeToWishes(
       (wishes) => {
-        renderWishes(wishes);
+        renderTickerWishes(wishes);
       },
       (error) => {
-        if (wishesList) wishesList.innerHTML = '';
-        if (wishesEmpty) wishesEmpty.style.display = 'none';
-        if (wishesScrollHint) wishesScrollHint.style.display = 'none';
-        if (wishesError) wishesError.style.display = 'block';
+        console.warn('Wishes ticker fetch error:', error);
+        if (tickerTrack) {
+          tickerTrack.innerHTML = `
+            <div class="ticker-item">
+              <span class="ticker-msg">ننتظر تهانيكم الجميلة بكل حب ✨</span>
+            </div>
+          `;
+        }
       }
     );
   }
 
   startWishesSubscription();
-
-  if (retryBtn) {
-    retryBtn.addEventListener('click', () => {
-      if (wishesList) {
-        wishesList.innerHTML = `
-          <div class="wish-card skeleton-card" aria-hidden="true">
-            <div class="skeleton-header"></div>
-            <div class="skeleton-line"></div>
-            <div class="skeleton-line short"></div>
-          </div>
-        `;
-      }
-      if (wishesError) wishesError.style.display = 'none';
-      startWishesSubscription();
-    });
-  }
 
   // --- Scroll Reveal Animations Observer (Scroll Up & Down) ---
   const revealElements = document.querySelectorAll('.reveal-on-scroll');
@@ -659,4 +713,3 @@ document.addEventListener('DOMContentLoaded', () => {
     revealElements.forEach((el) => el.classList.add('is-revealed'));
   }
 });
-
