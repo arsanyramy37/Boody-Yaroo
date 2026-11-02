@@ -292,21 +292,58 @@ document.addEventListener('DOMContentLoaded', () => {
   const overlay = document.getElementById('intro-overlay');
   let isOpening = false;
 
+  const envelopeImg   = overlay ? overlay.querySelector('.intro-envelope') : null;
+  const namesAbove    = overlay ? overlay.querySelector('.intro-names-above') : null;
+  const textGroup     = overlay ? overlay.querySelector('.intro-text-group') : null;
+  const openedImgSrc  = 'assets/imgs/opened.webp';
+
   function openInvitation() {
     if (isOpening) return;
     isOpening = true;
+
+    // Block all touch/click interaction during the sequence
+    overlay.style.pointerEvents = 'none';
+    overlay.style.touchAction   = 'none';
 
     // Direct user gesture to start audio
     audioController.play();
 
     if (!overlay) return;
 
-    overlay.classList.add('is-opening');
+    // --- Step 1: swap envelope → opened with a cross-fade ---
+    if (envelopeImg) {
+      // Fade out closed envelope
+      envelopeImg.style.transition = 'opacity 350ms ease';
+      envelopeImg.style.opacity    = '0';
+
+      setTimeout(() => {
+        // Hide names and tagline when opened envelope shows
+        if (namesAbove) namesAbove.classList.add('is-hidden-for-open');
+        if (textGroup)  textGroup.classList.add('is-hidden-for-open');
+
+        envelopeImg.src             = openedImgSrc;
+        envelopeImg.alt             = 'ظرف مفتوح';
+        envelopeImg.style.opacity   = '0';
+
+        // Tiny frame to allow browser to update src before fading in
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            envelopeImg.style.opacity = '1';
+          });
+        });
+      }, 380);
+    }
+
+    // --- Step 2: after 3 s, fade the whole overlay out ---
+    const dismissAfter = 3000; // ms to show the opened envelope
 
     const finishOpening = () => {
       overlay.classList.add('is-hidden');
       overlay.setAttribute('aria-hidden', 'true');
       document.body.classList.add('invitation-open');
+      // Re-enable scroll & touch now that overlay is gone
+      document.body.style.pointerEvents = '';
+      document.body.style.touchAction   = '';
       overlay.removeEventListener('transitionend', onTransitionEnd);
     };
 
@@ -316,8 +353,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    overlay.addEventListener('transitionend', onTransitionEnd);
-    window.setTimeout(finishOpening, 800); // Reliable fallback
+    setTimeout(() => {
+      overlay.classList.add('is-opening'); // triggers opacity → 0 CSS transition
+      overlay.addEventListener('transitionend', onTransitionEnd);
+      window.setTimeout(finishOpening, 800); // reliable fallback
+    }, dismissAfter);
   }
 
   if (overlay) {

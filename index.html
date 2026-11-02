@@ -51,6 +51,7 @@
       media="(min-width: 769px)"
     />
     <link rel="preload" as="image" href="assets/imgs/envelope.webp" />
+    <link rel="preload" as="image" href="assets/imgs/opened.webp" />
 
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="style.css" />
@@ -80,21 +81,23 @@
       </picture>
 
       <div class="intro-content">
+        <!-- Names above the envelope -->
+        <p class="intro-names-above" lang="en" dir="ltr">Boody &amp; Yaroo</p>
+
         <div class="intro-envelope-wrapper">
           <img
             class="intro-envelope"
             src="assets/imgs/envelope.webp"
             alt="ظرف دعوة الفرح"
           />
-          <div class="intro-text-group">
-            <h1 class="couple-heading" style="font-family: var(--font-names)">
-              Boody &amp; Yaroo
-            </h1>
-            <p class="intro-tagline" lang="en" dir="ltr">
-              And so, our forever begins
-            </p>
-            <span class="intro-tap-hint">Click To Open</span>
-          </div>
+        </div>
+
+        <!-- Text below the closed envelope only -->
+        <div class="intro-text-group">
+          <p class="intro-tagline" lang="en" dir="ltr">
+            And so, our forever begins
+          </p>
+          <span class="intro-tap-hint">Click To Open</span>
         </div>
       </div>
     </div>
@@ -249,14 +252,14 @@
       >
         <div class="container">
           <div class="section-header">
-            <h2 class="section-title">تفاصيل الفرح</h2>
+            <h2 class="section-title" lang="en" dir="ltr">Celebration Details</h2>
             <div class="section-divider" aria-hidden="true">
               <span class="divider-line"></span>
               <span class="divider-gem">✦</span>
               <span class="divider-line"></span>
             </div>
             <p class="section-subtitle">
-              حفل زفاف
+              Wedding of
               <span class="couple-name-highlight">Boody&amp;Yaroo</span>
             </p>
           </div>
@@ -279,8 +282,8 @@
                   ></path>
                 </svg>
               </div>
-              <h3 class="venue-name">قاعة ريونا</h3>
-              <p class="venue-subname">قاعة ريونا في دكرنس</p>
+              <h3 class="venue-name" lang="en" dir="ltr">Riona Hall</h3>
+              <p class="venue-subname">قاعة ريونا — دكرنس</p>
             </div>
 
             <div class="venue-info-grid">
@@ -387,7 +390,7 @@
                   <line x1="8" y1="2" x2="8" y2="18"></line>
                   <line x1="16" y1="6" x2="16" y2="22"></line>
                 </svg>
-                <span>فتح موقع القاعة على Google Maps</span>
+                <span>Google Maps</span>
               </a>
             </div>
           </div>
@@ -400,46 +403,46 @@
       <section id="countdown" class="countdown-section reveal-on-scroll">
         <div class="container">
           <div class="section-header">
-            <h2 class="section-title">العد التنازلي</h2>
+            <h2 class="section-title" lang="en" dir="ltr">Counting Down</h2>
             <div class="section-divider" aria-hidden="true">
               <span class="divider-line"></span>
               <span class="divider-gem">✦</span>
               <span class="divider-line"></span>
             </div>
-            <p class="section-subtitle">يوم يجمعنا بكم</p>
+            <p class="section-subtitle" lang="en" dir="ltr">The day we've all been waiting for</p>
           </div>
 
           <div
             id="countdown-timer"
             class="countdown-grid"
-            aria-label="العد التنازلي لموعد الفرح"
+            aria-label="Countdown to the wedding"
           >
             <div class="countdown-card">
               <div class="countdown-value-box">
                 <span id="countdown-days" class="countdown-number">00</span>
               </div>
-              <span class="countdown-label">الأيام</span>
+              <span class="countdown-label" lang="en">Days</span>
             </div>
 
             <div class="countdown-card">
               <div class="countdown-value-box">
                 <span id="countdown-hours" class="countdown-number">00</span>
               </div>
-              <span class="countdown-label">الساعات</span>
+              <span class="countdown-label" lang="en">Hours</span>
             </div>
 
             <div class="countdown-card">
               <div class="countdown-value-box">
                 <span id="countdown-minutes" class="countdown-number">00</span>
               </div>
-              <span class="countdown-label">الدقائق</span>
+              <span class="countdown-label" lang="en">Minutes</span>
             </div>
 
             <div class="countdown-card">
               <div class="countdown-value-box">
                 <span id="countdown-seconds" class="countdown-number">00</span>
               </div>
-              <span class="countdown-label">الثواني</span>
+              <span class="countdown-label" lang="en">Seconds</span>
             </div>
           </div>
 
@@ -448,8 +451,8 @@
             class="countdown-expired-msg"
             style="display: none"
           >
-            <p class="expired-headline">النهارده فرحتنا.. مستنيينكم!</p>
-            <p class="expired-subtext">أهلاً وسهلاً بكم في ليلتنا المميزة</p>
+            <p class="expired-headline" lang="en" dir="ltr">Today is our wedding day — we can't wait to see you!</p>
+            <p class="expired-subtext" lang="en" dir="ltr">Welcome to our special evening</p>
           </div>
         </div>
       </section>
@@ -460,14 +463,14 @@
       <section id="send-wish" class="send-wish-section reveal-on-scroll">
         <div class="container form-container">
           <div class="section-header">
-            <h2 class="section-title">ابعت تهنئتك</h2>
+            <h2 class="section-title" lang="en" dir="ltr">Send Your Wishes</h2>
             <div class="section-divider" aria-hidden="true">
               <span class="divider-line"></span>
               <span class="divider-gem">✦</span>
               <span class="divider-line"></span>
             </div>
-            <p class="section-subtitle">
-              كلماتكم الطيبة وأمنياتكم الصادقة تسعد قلوبنا وتصنع ذكرى لا تُنسى
+            <p class="section-subtitle" lang="en" dir="ltr">
+              Your heartfelt words mean the world to us
             </p>
           </div>
 
@@ -535,14 +538,14 @@
       <section id="guest-wishes" class="guest-wishes-section reveal-on-scroll">
         <div class="container">
           <div class="section-header">
-            <h2 class="section-title">تهاني الأحباب</h2>
+            <h2 class="section-title" lang="en" dir="ltr">Wishes Wall</h2>
             <div class="section-divider" aria-hidden="true">
               <span class="divider-line"></span>
               <span class="divider-gem">✦</span>
               <span class="divider-line"></span>
             </div>
-            <p class="section-subtitle">
-              شكراً لكل من شاركنا فرحتنا بكلمة من القلب
+            <p class="section-subtitle" lang="en" dir="ltr">
+              Thank you for sharing your love &amp; blessings with us
             </p>
           </div>
 
@@ -626,7 +629,7 @@
     <footer id="site-footer" class="site-footer">
       <div class="container footer-container">
         <div class="footer-monogram" aria-hidden="true">Boody &amp; Yaroo</div>
-        <p class="footer-blessing">نسعد بحضوركم واكتمال فرحتنا بكم</p>
+        <p class="footer-blessing">مستنيينكم متتأخروش</p>
         <div class="footer-divider" aria-hidden="true"></div>
         <p class="developer-credit">
           designed and developed by
