@@ -53,7 +53,7 @@ requiredIds.forEach((id) => {
 });
 check(
   [...idCounts.values()].every((count) => count === 1),
-  'No duplicate DOM ids'
+  'No duplicate DOM ids',
 );
 check(!idCounts.has('guest-wishes'), 'Retired guest-wishes section is absent');
 
@@ -62,7 +62,7 @@ const localReferences = [
 ].flatMap((match) =>
   match[0].startsWith('srcset=')
     ? match[1].split(',').map((item) => item.trim().split(/\s+/)[0])
-    : [match[1]]
+    : [match[1]],
 );
 
 localReferences
@@ -78,15 +78,18 @@ localReferences
     const localPath = decodeURIComponent(reference.split(/[?#]/)[0]);
     check(
       fs.existsSync(path.resolve(root, localPath)),
-      `Local HTML asset exists: ${localPath}`
+      `Local HTML asset exists: ${localPath}`,
     );
   });
 
 const runtimeAssets = new Set(
-  [...js.matchAll(/['"](assets\/[^'"]+)['"]/g)].map((match) => match[1])
+  [...js.matchAll(/['"](assets\/[^'"]+)['"]/g)].map((match) => match[1]),
 );
 runtimeAssets.forEach((asset) => {
-  check(fs.existsSync(path.resolve(root, asset)), `Local JavaScript asset exists: ${asset}`);
+  check(
+    fs.existsSync(path.resolve(root, asset)),
+    `Local JavaScript asset exists: ${asset}`,
+  );
 });
 
 const cssWithoutComments = css.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -98,7 +101,10 @@ for (const character of cssWithoutComments) {
 check(braceBalance === 0, `CSS braces are balanced (${braceBalance})`);
 check(css.includes('.wishes-ticker-bar'), 'Wishes ticker styles are present');
 check(css.includes('.ticker-viewport'), 'Scrollable ticker styles are present');
-check(css.includes('prefers-reduced-motion'), 'Reduced-motion support is present');
+check(
+  css.includes('prefers-reduced-motion'),
+  'Reduced-motion support is present',
+);
 
 check(fs.existsSync(headersPath), 'Static-host response headers file exists');
 [
@@ -106,14 +112,24 @@ check(fs.existsSync(headersPath), 'Static-host response headers file exists');
   /^  X-Frame-Options:\s*DENY$/im,
   /^  Referrer-Policy:\s*strict-origin-when-cross-origin$/im,
   /^  Permissions-Policy:/im,
-].forEach((pattern) => check(pattern.test(headers), `Security header: ${pattern.source}`));
-check(/Cache-Control:\s*public,\s*max-age=31536000,\s*immutable/i.test(headers), 'Assets use long-lived immutable caching');
-check(/Cache-Control:\s*public,\s*max-age=0,\s*must-revalidate/i.test(headers), 'HTML and app code revalidate on deploy');
+].forEach((pattern) =>
+  check(pattern.test(headers), `Security header: ${pattern.source}`),
+);
+check(
+  /Cache-Control:\s*public,\s*max-age=31536000,\s*immutable/i.test(headers),
+  'Assets use long-lived immutable caching',
+);
+check(
+  /Cache-Control:\s*public,\s*max-age=0,\s*must-revalidate/i.test(headers),
+  'HTML and app code revalidate on deploy',
+);
 
 check(
   /https:\/\/www\.gstatic\.com\/firebasejs\/13\.1\.0\//.test(js),
-  'Firebase SDK uses a pinned version'
+  'Firebase SDK uses a pinned version',
 );
 
-console.log(`\n${passed ? 'Production sanity checks passed.' : 'Production sanity checks failed.'}`);
+console.log(
+  `\n${passed ? 'Production sanity checks passed.' : 'Production sanity checks failed.'}`,
+);
 if (!passed) process.exitCode = 1;
