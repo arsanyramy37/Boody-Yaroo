@@ -30,7 +30,9 @@ export const EVENT_CONFIG = {
     time: '7:30 مساءً',
     mapsUrl:
       'https://www.google.com/maps/search/?api=1&query=' +
-      encodeURIComponent('قاعة ريونا، مدينة دكرنس، مركز دكرنس، محافظة الدقهلية 7820222'),
+      encodeURIComponent(
+        'قاعة ريونا، مدينة دكرنس، مركز دكرنس، محافظة الدقهلية 7820222',
+      ),
   },
 
   media: {
@@ -148,13 +150,13 @@ export class AudioController {
     button.setAttribute('aria-pressed', String(playing));
     button.setAttribute(
       'aria-label',
-      playing ? 'إيقاف الموسيقى' : 'تشغيل الموسيقى'
+      playing ? 'إيقاف الموسيقى' : 'تشغيل الموسيقى',
     );
   }
 }
 
 export const audioController = new AudioController(
-  EVENT_CONFIG.media.backgroundMusic
+  EVENT_CONFIG.media.backgroundMusic,
 );
 
 // ==========================================================================
@@ -182,11 +184,9 @@ export function initCountdown(targetIso, onTick, onExpired) {
 
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
     const hours = Math.floor(
-      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
     );
-    const minutes = Math.floor(
-      (distance % (1000 * 60 * 60)) / (1000 * 60)
-    );
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
     onTick({
@@ -216,7 +216,7 @@ export function subscribeToWishes(onWishesUpdated, onError) {
   const q = query(
     wishesRef,
     orderBy('createdAt', 'desc'),
-    limit(EVENT_CONFIG.limits.wishesToRender)
+    limit(EVENT_CONFIG.limits.wishesToRender),
   );
 
   return onSnapshot(
@@ -231,7 +231,7 @@ export function subscribeToWishes(onWishesUpdated, onError) {
     (error) => {
       console.error('Could not load guest wishes:', error);
       onError?.(error);
-    }
+    },
   );
 }
 
@@ -240,9 +240,7 @@ export async function submitWish(name, message) {
     throw new Error('خدمة إرسال التهاني غير متاحة حالياً.');
   }
 
-  const cleanName = String(name)
-    .trim()
-    .slice(0, EVENT_CONFIG.limits.name);
+  const cleanName = String(name).trim().slice(0, EVENT_CONFIG.limits.name);
 
   const cleanMessage = String(message)
     .trim()
@@ -292,10 +290,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const overlay = document.getElementById('intro-overlay');
   let isOpening = false;
 
-  const envelopeImg   = overlay ? overlay.querySelector('.intro-envelope') : null;
-  const namesAbove    = overlay ? overlay.querySelector('.intro-names-above') : null;
-  const textGroup     = overlay ? overlay.querySelector('.intro-text-group') : null;
-  const openedImgSrc  = 'assets/imgs/opened.webp';
+  const envelopeImg = overlay ? overlay.querySelector('.intro-envelope') : null;
+  const namesAbove = overlay
+    ? overlay.querySelector('.intro-names-above')
+    : null;
+  const textGroup = overlay ? overlay.querySelector('.intro-text-group') : null;
+  const openedImgSrc = 'assets/imgs/opened.webp';
 
   function openInvitation() {
     if (isOpening) return;
@@ -313,16 +313,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (envelopeImg) {
       // Fade out closed envelope
       envelopeImg.style.transition = 'opacity 350ms ease';
-      envelopeImg.style.opacity    = '0';
+      envelopeImg.style.opacity = '0';
 
       setTimeout(() => {
         // Hide names and tagline when opened envelope shows
         if (namesAbove) namesAbove.classList.add('is-hidden-for-open');
-        if (textGroup)  textGroup.classList.add('is-hidden-for-open');
+        if (textGroup) textGroup.classList.add('is-hidden-for-open');
 
-        envelopeImg.src             = openedImgSrc;
-        envelopeImg.alt             = 'ظرف مفتوح';
-        envelopeImg.style.opacity   = '0';
+        envelopeImg.src = openedImgSrc;
+        envelopeImg.alt = 'ظرف مفتوح';
+        envelopeImg.style.opacity = '0';
 
         // Tiny frame to allow browser to update src before fading in
         requestAnimationFrame(() => {
@@ -347,15 +347,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Unlock scroll on BOTH html and body — covers all browsers & iOS Safari
       document.documentElement.classList.add('invitation-open');
-      document.documentElement.style.overflow    = '';
+      document.documentElement.style.overflow = '';
       document.documentElement.style.touchAction = '';
-      document.documentElement.style.overflowY   = '';
+      document.documentElement.style.overflowY = '';
       document.body.classList.add('invitation-open');
-      document.body.style.overflow        = '';
-      document.body.style.height          = '';
-      document.body.style.touchAction     = '';
-      document.body.style.pointerEvents   = '';
-      document.body.style.overflowY       = '';
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+      document.body.style.touchAction = '';
+      document.body.style.pointerEvents = '';
+      document.body.style.overflowY = '';
     };
 
     const onTransitionEnd = (event) => {
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
     () => {
       if (timerGrid) timerGrid.style.display = 'none';
       if (expiredMsg) expiredMsg.style.display = 'block';
-    }
+    },
   );
 
   // --- Send Wish Form Handling ---
@@ -500,16 +500,23 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         await submitWish(name, message);
 
-        setFormStatus('شكراً لتهنئتكم الجميلة! تم إرسال رسالتكم بنجاح.', 'success');
+        setFormStatus(
+          'شكراً لتهنئتكم الجميلة! تم إرسال رسالتكم بنجاح.',
+          'success',
+        );
         if (wishNameInput) wishNameInput.value = '';
         if (wishMessageInput) wishMessageInput.value = '';
-        if (charCounter) charCounter.textContent = `0 / ${EVENT_CONFIG.limits.message}`;
+        if (charCounter)
+          charCounter.textContent = `0 / ${EVENT_CONFIG.limits.message}`;
 
         setTimeout(() => {
           clearFormStatus();
         }, 6000);
       } catch (err) {
-        setFormStatus(err.message || 'حدث خطأ أثناء إرسال التهنئة. يرجى المحاولة مرة أخرى.', 'error');
+        setFormStatus(
+          err.message || 'حدث خطأ أثناء إرسال التهنئة. يرجى المحاولة مرة أخرى.',
+          'error',
+        );
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -549,8 +556,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const buildItemsHTML = (list) => {
       return list
         .map((wish) => {
-          const author = (wish.name || 'محب').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          const msg = (wish.message || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          const author = (wish.name || 'محب')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+          const msg = (wish.message || '')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
           return `
             <div class="ticker-item">
               <span class="ticker-author">${author}</span>
@@ -567,9 +578,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const cycleWidth = tickerTrack.scrollWidth;
     const copyCount = Math.max(
       2,
-      Math.ceil((tickerViewport.clientWidth + cycleWidth) / cycleWidth)
+      Math.ceil((tickerViewport.clientWidth + cycleWidth) / cycleWidth),
     );
-    tickerTrack.innerHTML = Array.from({ length: copyCount }, () => baseHtml).join('');
+    tickerTrack.innerHTML = Array.from(
+      { length: copyCount },
+      () => baseHtml,
+    ).join('');
 
     initTickerMarquee(cycleWidth);
   }
@@ -627,12 +641,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tickerViewport.addEventListener('pointermove', (event) => {
       if (event.pointerId === activePointerId) {
-        tickerViewport.scrollLeft = scrollStartLeft - (event.clientX - pointerStartX);
+        tickerViewport.scrollLeft =
+          scrollStartLeft - (event.clientX - pointerStartX);
       }
     });
 
     const finishPointerInteraction = (event) => {
-      if (event.pointerId !== activePointerId && activePointerId !== null) return;
+      if (event.pointerId !== activePointerId && activePointerId !== null)
+        return;
       activePointerId = null;
       tickerViewport.classList.remove('is-dragging');
       resumeTicker();
@@ -640,24 +656,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tickerViewport.addEventListener('pointerup', finishPointerInteraction);
     tickerViewport.addEventListener('pointercancel', finishPointerInteraction);
-    tickerViewport.addEventListener('wheel', () => {
-      pauseTicker();
-      resumeTicker();
-    }, { passive: true });
+    tickerViewport.addEventListener(
+      'wheel',
+      () => {
+        pauseTicker();
+        resumeTicker();
+      },
+      { passive: true },
+    );
     tickerViewport.addEventListener('keydown', (event) => {
-      if (['ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown'].includes(event.key)) {
+      if (
+        [
+          'ArrowLeft',
+          'ArrowRight',
+          'Home',
+          'End',
+          'PageUp',
+          'PageDown',
+        ].includes(event.key)
+      ) {
         pauseTicker();
         resumeTicker();
       }
     });
-    tickerViewport.addEventListener('scroll', () => {
-      if (isUserInteracting) {
-        if (resumeTimeout) clearTimeout(resumeTimeout);
-        resumeTimeout = setTimeout(() => {
-          isUserInteracting = false;
-        }, 2500);
-      }
-    }, { passive: true });
+    tickerViewport.addEventListener(
+      'scroll',
+      () => {
+        if (isUserInteracting) {
+          if (resumeTimeout) clearTimeout(resumeTimeout);
+          resumeTimeout = setTimeout(() => {
+            isUserInteracting = false;
+          }, 2500);
+        }
+      },
+      { passive: true },
+    );
   }
 
   function startWishesSubscription() {
@@ -679,7 +712,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           `;
         }
-      }
+      },
     );
   }
 
@@ -704,7 +737,7 @@ document.addEventListener('DOMContentLoaded', () => {
         root: null,
         rootMargin: '0px 0px -40px 0px',
         threshold: 0.12,
-      }
+      },
     );
 
     revealElements.forEach((el) => observer.observe(el));
